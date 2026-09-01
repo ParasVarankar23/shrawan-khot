@@ -1,7 +1,6 @@
 "use client";
 
 export default function FinalBirthdayChapter({
-    onOpenLetter,
     onPrevious,
 }) {
     return (
@@ -80,12 +79,34 @@ export default function FinalBirthdayChapter({
 
                 </div>
 
-                <button
-                    onClick={onOpenLetter}
-                    className="mt-10 rounded-full bg-[#FF6B81] px-9 py-4 font-bold text-white shadow-xl shadow-[#FF6B81]/25 transition hover:-translate-y-1 hover:bg-[#ff526d] hover:shadow-2xl"
-                >
-                    Open Your Birthday Letter 💌
-                </button>
+                <div className="mt-10 space-y-5">
+
+                    <div className="mx-auto max-w-xl rounded-[2rem] border border-[#FFD5DD] bg-white/80 p-6 shadow-[0_20px_60px_rgba(255,107,129,0.12)] backdrop-blur-sm sm:p-8">
+
+                        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-[#FF6B81]">
+                            Memory Capsule
+                        </p>
+
+                        <p className="mt-4 font-serif text-2xl font-bold leading-relaxed text-[#263238] sm:text-3xl">
+                            Some friendships are not loud.
+                            <span className="block text-[#FF6B81]">
+                                They are the ones who stay.
+                            </span>
+                        </p>
+
+                    </div>
+
+                    <div className="flex items-center justify-center gap-4 text-2xl">
+                        <span>✨</span>
+                        <span>💛</span>
+                        <span>✨</span>
+                    </div>
+
+                    <p className="text-sm font-semibold uppercase tracking-[0.26em] text-[#8A8E93]">
+                        The story ends here, but the friendship continues
+                    </p>
+
+                </div>
 
                 <p className="mt-12 text-xs uppercase tracking-[0.25em] text-[#B0B4B7]">
                     Friends since 2016 • Still friends in 2026

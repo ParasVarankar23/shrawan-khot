@@ -1,25 +1,19 @@
 "use client";
 
-export default function BirthdayLetter({ open, onClose }) {
+export default function BirthdayLetter({ open }) {
     if (!open) return null;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#263238]/40 px-5 py-8 backdrop-blur-sm">
 
-            <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#FFF9F2] p-7 shadow-2xl sm:p-12">
+            <div className="relative w-full max-w-2xl rounded-3xl bg-[#FFF9F2] p-8 shadow-2xl sm:p-12">
 
-                <button
-                    onClick={onClose}
-                    className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white text-2xl text-[#6B7280] shadow-sm transition hover:bg-[#FFE5EA] hover:text-[#FF6B81]"
-                >
-                    ×
-                </button>
-
-                <div className="mb-7 text-5xl">
+                {/* Letter Icon */}
+                <div className="mb-6 text-5xl">
                     💌
                 </div>
 
-                <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#FF6B81]">
+                <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#FF6B81]">
                     A Birthday Letter
                 </p>
 
@@ -27,53 +21,30 @@ export default function BirthdayLetter({ open, onClose }) {
                     Dear Shrawan,
                 </h2>
 
-                <div className="mt-8 space-y-6 text-base leading-8 text-[#59636A]">
+                <div className="mt-8 space-y-5 text-base leading-8 text-[#59636A]">
 
                     <p>
-                        Ten years ago, we were just two students in 6th grade. Neither of
-                        us knew how many memories we would create together.
+                        Ten years, countless memories, and one friendship
+                        that somehow survived it all.
                     </p>
 
                     <p>
-                        From the Social Studies incident to the legendary 7th-grade pant
-                        incident, from studying together to giving each other completely
-                        wrong answers during exams — our friendship has always had its own
-                        kind of madness.
+                        Thank you for always being there through the good,
+                        the bad, and all the madness in between.
                     </p>
 
                     <p>
-                        But beyond all the jokes and funny memories, I am genuinely
-                        grateful for your loyalty.
-                    </p>
-
-                    <p>
-                        When things became difficult between 2023 and 2026, you continued
-                        to stand by me. That is something I will always remember.
-                    </p>
-
-                    <p>
-                        We may have gone to different colleges and our lives may have
-                        taken different directions, but our friendship never completely
-                        disappeared.
-                    </p>
-
-                    <p>
-                        So on your birthday, I just want to say thank you — for the
-                        memories, the laughter, the support, and for being a genuinely
-                        good friend.
+                        No matter where life takes us, I hope this friendship
+                        always remains a part of our story.
                     </p>
 
                     <p className="font-serif text-2xl font-bold text-[#FF6B81]">
-                        Happy Birthday, Shrawan! 🎂
-                    </p>
-
-                    <p>
-                        Here's to the memories we've made and all the ones still to come.
+                        Happy Birthday, Shrawan! 🎂❤️
                     </p>
 
                 </div>
 
-                <div className="mt-10 rounded-2xl bg-[#FFE5EA] p-5 text-center">
+                <div className="mt-9 rounded-2xl bg-[#FFE5EA] p-5 text-center">
                     <p className="font-semibold text-[#FF6B81]">
                         Friends since 2016 • Still friends in 2026 ❤️
                     </p>
@@ -83,3 +54,4 @@ export default function BirthdayLetter({ open, onClose }) {
         </div>
     );
 }
+
