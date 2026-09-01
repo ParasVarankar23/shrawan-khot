@@ -19,12 +19,11 @@ import ForgottenBirthdayChapter from "@/components/chapters/ForgottenBirthdayCha
 import DifficultYearsChapter from "@/components/chapters/DifficultYearsChapter";
 import FinalBirthdayChapter from "@/components/chapters/FinalBirthdayChapter";
 
-function BirthdayExperience() {
+function BirthdayExperience({ autoStart }) {
     const [started, setStarted] = useState(false);
     const [chapter, setChapter] = useState(0);
     const [transitioning, setTransitioning] = useState(false);
     const [showLetter, setShowLetter] = useState(false);
-    const [passwordUnlocked, setPasswordUnlocked] = useState(false);
 
     const audioRef = useRef(null);
     const storyScrollRef = useRef(null);
@@ -108,17 +107,18 @@ function BirthdayExperience() {
         }
     };
 
-    const handlePasswordUnlock = async () => {
-        setPasswordUnlocked(true);
-        await startStory();
-    };
-
     const closeLetterAndReturnHome = () => {
         setShowLetter(false);
         setStarted(false);
         setChapter(0);
         setTransitioning(false);
     };
+
+    useEffect(() => {
+        if (!autoStart) return;
+
+        startStory();
+    }, [autoStart]);
 
     /*
     |--------------------------------------------------------------------------
@@ -324,14 +324,6 @@ function BirthdayExperience() {
     |--------------------------------------------------------------------------
     */
 
-    if (!passwordUnlocked) {
-        return (
-            <PasswordGate onUnlocked={handlePasswordUnlock}>
-                <div />
-            </PasswordGate>
-        );
-    }
-
     if (!started) {
         return (
             <main className="relative min-h-[100svh] overflow-hidden bg-[#FFF9F2] text-[#263238]">
@@ -523,10 +515,14 @@ function BirthdayExperience() {
 */
 
 export default function Home() {
-    return (
-        <PasswordGate>
-            <BirthdayExperience />
-        </PasswordGate>
-    );
+    const [isUnlocked, setIsUnlocked] = useState(false);
+
+    if (!isUnlocked) {
+        return (
+            <PasswordGate onUnlocked={() => setIsUnlocked(true)} />
+        );
+    }
+
+    return <BirthdayExperience autoStart={true} />;
 }
 
