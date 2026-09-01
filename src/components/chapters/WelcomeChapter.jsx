@@ -37,15 +37,6 @@ export default function WelcomeChapter({ onNext }) {
                     2016 → 2026 ❤️
                 </div>
 
-                <div>
-                    <button
-                        onClick={onNext}
-                        className="mt-10 rounded-full bg-[#FF6B81] px-8 py-4 font-bold text-white shadow-xl shadow-[#FF6B81]/20 transition hover:-translate-y-1 hover:bg-[#ff526d]"
-                    >
-                        Continue the Story →
-                    </button>
-                </div>
-
             </div>
         </section>
     );

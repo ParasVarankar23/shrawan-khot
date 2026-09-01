@@ -74,24 +74,6 @@ export default function PantIncidentChapter({
 
                 </div>
 
-                <div className="mt-10 flex justify-center gap-4">
-
-                    <button
-                        onClick={onPrevious}
-                        className="rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        onClick={onNext}
-                        className="rounded-full bg-[#7C83FD] px-7 py-3 text-sm font-bold text-white shadow-lg transition hover:-translate-y-1"
-                    >
-                        I Have More Memories →
-                    </button>
-
-                </div>
-
             </div>
         </section>
     );

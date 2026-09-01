@@ -26,6 +26,7 @@ export default function Home() {
   const [letterOpen, setLetterOpen] = useState(false);
 
   const audioRef = useRef(null);
+  const storyScrollRef = useRef(null);
 
   /*
   |--------------------------------------------------------------------------
@@ -136,6 +137,13 @@ export default function Home() {
        */
       requestAnimationFrame(() => {
         setTransitioning(false);
+
+        if (storyScrollRef.current) {
+          storyScrollRef.current.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }
       });
     }, 450);
   };
@@ -163,6 +171,37 @@ export default function Home() {
       changeChapter(chapter - 1);
     }
   };
+
+  const isLastChapter = chapter === chapters.length - 1;
+
+  /*
+  |--------------------------------------------------------------------------
+  | AUTO-PROGRESS STORY
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    if (!started || letterOpen || transitioning || isLastChapter) return;
+
+    const timer = setTimeout(() => {
+      nextChapter();
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, [started, chapter, letterOpen, transitioning, isLastChapter]);
+
+  useEffect(() => {
+    if (!started || !isLastChapter || letterOpen || transitioning) return;
+
+    const returnTimer = setTimeout(() => {
+      setStarted(false);
+      setChapter(0);
+      setTransitioning(false);
+      setLetterOpen(false);
+    }, 10000);
+
+    return () => clearTimeout(returnTimer);
+  }, [started, isLastChapter, letterOpen, transitioning]);
 
   /*
   |--------------------------------------------------------------------------
@@ -292,9 +331,6 @@ export default function Home() {
 
   const CurrentChapter = chapters[chapter].component;
 
-  const isFirstChapter = chapter === 0;
-  const isLastChapter = chapter === chapters.length - 1;
-
   /*
   |--------------------------------------------------------------------------
   | MAIN STORY
@@ -352,7 +388,10 @@ export default function Home() {
           }
         `}
       >
-        <div className="h-full w-full overflow-y-auto overscroll-contain">
+        <div
+          ref={storyScrollRef}
+          className="h-full w-full overflow-y-auto overscroll-contain"
+        >
 
           <CurrentChapter
             onNext={nextChapter}
@@ -394,112 +433,6 @@ export default function Home() {
         </div>
 
       </div>
-
-      {/* =========================================================
-          DESKTOP PREVIOUS
-         ========================================================= */}
-
-      {!isFirstChapter && (
-        <button
-          type="button"
-          onClick={previousChapter}
-          disabled={transitioning}
-          aria-label="Previous chapter"
-          className="
-            fixed
-            left-5
-            top-1/2
-            z-50
-            hidden
-            -translate-y-1/2
-            items-center
-            justify-center
-
-            rounded-full
-            border
-            border-white/90
-            bg-white/80
-
-            px-4
-            py-4
-
-            text-lg
-            text-[#777E84]
-
-            shadow-xl
-            shadow-black/5
-
-            backdrop-blur-xl
-
-            transition-all
-            duration-300
-
-            hover:-translate-x-1
-            hover:bg-white
-            hover:text-[#FF6B81]
-
-            disabled:pointer-events-none
-            disabled:opacity-40
-
-            md:flex
-          "
-        >
-          ←
-        </button>
-      )}
-
-      {/* =========================================================
-          DESKTOP NEXT
-         ========================================================= */}
-
-      {!isLastChapter && (
-        <button
-          type="button"
-          onClick={nextChapter}
-          disabled={transitioning}
-          aria-label="Next chapter"
-          className="
-            fixed
-            right-5
-            top-1/2
-            z-50
-            hidden
-            -translate-y-1/2
-            items-center
-            justify-center
-
-            rounded-full
-            border
-            border-white/90
-            bg-white/80
-
-            px-4
-            py-4
-
-            text-lg
-            text-[#777E84]
-
-            shadow-xl
-            shadow-black/5
-
-            backdrop-blur-xl
-
-            transition-all
-            duration-300
-
-            hover:translate-x-1
-            hover:bg-white
-            hover:text-[#FF6B81]
-
-            disabled:pointer-events-none
-            disabled:opacity-40
-
-            md:flex
-          "
-        >
-          →
-        </button>
-      )}
 
       {/* =========================================================
           BOTTOM CHAPTER NAVIGATION
@@ -566,47 +499,6 @@ export default function Home() {
         </div>
 
       </div>
-
-      {/* =========================================================
-          MOBILE CONTINUE
-         ========================================================= */}
-
-      {!isLastChapter && (
-        <div className="fixed bottom-[4.5rem] left-1/2 z-50 -translate-x-1/2 md:hidden">
-
-          <button
-            type="button"
-            onClick={nextChapter}
-            disabled={transitioning}
-            className="
-              rounded-full
-              bg-[#FF6B81]
-
-              px-6
-              py-3
-
-              text-[11px]
-              font-black
-              uppercase
-              tracking-[0.2em]
-              text-white
-
-              shadow-xl
-              shadow-[#FF6B81]/25
-
-              transition-all
-              duration-300
-
-              active:scale-95
-
-              disabled:opacity-50
-            "
-          >
-            Continue →
-          </button>
-
-        </div>
-      )}
 
       {/* =========================================================
           MOBILE SWIPE HINT

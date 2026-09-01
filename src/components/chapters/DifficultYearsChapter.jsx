@@ -79,24 +79,6 @@ export default function DifficultYearsChapter({
 
                 </div>
 
-                <div className="mt-10 flex justify-center gap-4">
-
-                    <button
-                        onClick={onPrevious}
-                        className="rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        onClick={onNext}
-                        className="rounded-full bg-[#FF6B81] px-7 py-3 text-sm font-bold text-white shadow-lg"
-                    >
-                        Final Chapter →
-                    </button>
-
-                </div>
-
             </div>
         </section>
     );

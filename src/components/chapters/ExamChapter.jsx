@@ -90,24 +90,6 @@ export default function ExamChapter({
 
                 </div>
 
-                <div className="mt-10 flex justify-center gap-4">
-
-                    <button
-                        onClick={onPrevious}
-                        className="rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        onClick={onNext}
-                        className="rounded-full bg-[#FFD166] px-7 py-3 text-sm font-bold text-[#5D4A00] shadow-lg"
-                    >
-                        Next Chapter →
-                    </button>
-
-                </div>
-
             </div>
         </section>
     );

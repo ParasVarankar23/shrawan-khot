@@ -111,25 +111,6 @@ export default function CollegeChapter({ onNext, onPrevious }) {
 
                 </div>
 
-                {/* Navigation */}
-                <div className="mt-12 flex items-center justify-center gap-4">
-
-                    <button
-                        onClick={onPrevious}
-                        className="rounded-full border border-[#D9D9E8] bg-white px-6 py-3 text-sm font-semibold text-[#687078] shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-                    >
-                        ← Previous
-                    </button>
-
-                    <button
-                        onClick={onNext}
-                        className="rounded-full bg-[#7C83FD] px-7 py-3 text-sm font-bold text-white shadow-lg shadow-[#7C83FD]/20 transition hover:-translate-y-1 hover:bg-[#6870F0]"
-                    >
-                        Continue →
-                    </button>
-
-                </div>
-
             </div>
         </section>
     );

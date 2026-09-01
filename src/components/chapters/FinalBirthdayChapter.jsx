@@ -87,17 +87,6 @@ export default function FinalBirthdayChapter({
                     Open Your Birthday Letter 💌
                 </button>
 
-                <div className="mt-5">
-
-                    <button
-                        onClick={onPrevious}
-                        className="text-sm font-semibold text-[#9CA3AF] transition hover:text-[#FF6B81]"
-                    >
-                        ← Go back through the memories
-                    </button>
-
-                </div>
-
                 <p className="mt-12 text-xs uppercase tracking-[0.25em] text-[#B0B4B7]">
                     Friends since 2016 • Still friends in 2026
                 </p>
