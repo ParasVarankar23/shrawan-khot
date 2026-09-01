@@ -19,7 +19,7 @@ import ForgottenBirthdayChapter from "@/components/chapters/ForgottenBirthdayCha
 import DifficultYearsChapter from "@/components/chapters/DifficultYearsChapter";
 import FinalBirthdayChapter from "@/components/chapters/FinalBirthdayChapter";
 
-function BirthdayExperience({ autoStart }) {
+function BirthdayExperience() {
     const [started, setStarted] = useState(false);
     const [chapter, setChapter] = useState(0);
     const [transitioning, setTransitioning] = useState(false);
@@ -107,18 +107,32 @@ function BirthdayExperience({ autoStart }) {
         }
     };
 
-    const closeLetterAndReturnHome = () => {
-        setShowLetter(false);
-        setStarted(false);
-        setChapter(0);
-        setTransitioning(false);
+    /*
+    |--------------------------------------------------------------------------
+    | OPEN LETTER
+    |--------------------------------------------------------------------------
+    */
+
+    const openLetter = () => {
+        setShowLetter(true);
+
+        setTimeout(() => {
+            setShowLetter(false);
+            setStarted(false);
+            setChapter(0);
+            setTransitioning(false);
+        }, 7000);
     };
 
-    useEffect(() => {
-        if (!autoStart) return;
+    /*
+    |--------------------------------------------------------------------------
+    | AUTO START
+    |--------------------------------------------------------------------------
+    */
 
+    useEffect(() => {
         startStory();
-    }, [autoStart]);
+    }, []);
 
     /*
     |--------------------------------------------------------------------------
@@ -153,6 +167,8 @@ function BirthdayExperience({ autoStart }) {
     const nextChapter = () => {
         if (chapter < chapters.length - 1) {
             changeChapter(chapter + 1);
+        } else {
+            openLetter();
         }
     };
 
@@ -164,25 +180,133 @@ function BirthdayExperience({ autoStart }) {
 
     /*
     |--------------------------------------------------------------------------
-    | AUTOMATIC CHAPTER PROGRESS
+    | AUTOMATIC SMOOTH SCROLL
     |--------------------------------------------------------------------------
+    |
+    | Every chapter slowly scrolls from top to bottom.
+    |
     */
 
     useEffect(() => {
         if (
             !started ||
             transitioning ||
-            showLetter ||
-            isLastChapter
+            showLetter
         ) {
             return;
         }
 
-        const timer = setTimeout(() => {
-            nextChapter();
-        }, 10000);
+        const container = storyScrollRef.current;
 
-        return () => clearTimeout(timer);
+        if (!container) return;
+
+        let animationFrame;
+        let nextChapterTimer;
+        let lastTime = performance.now();
+
+        /*
+         * Faster chapter progression for a quicker story flow.
+         */
+        const scrollSpeed = 30;
+
+        const autoScroll = (currentTime) => {
+            const deltaTime =
+                currentTime - lastTime;
+
+            lastTime = currentTime;
+
+            /*
+             * Scroll smoothly
+             */
+            container.scrollTop +=
+                (scrollSpeed * deltaTime) / 1000;
+
+            /*
+             * Check if chapter reached bottom
+             */
+            const contentFitsViewport =
+                container.scrollHeight <=
+                container.clientHeight + 8;
+
+            const reachedBottom =
+                contentFitsViewport ||
+                (
+                    container.scrollTop +
+                        container.clientHeight >=
+                    container.scrollHeight - 5
+                );
+
+            if (reachedBottom) {
+
+                /*
+                 * Stop current animation
+                 */
+                if (animationFrame) {
+                    cancelAnimationFrame(
+                        animationFrame
+                    );
+                }
+
+                /*
+                 * Wait a little at the bottom
+                 */
+                nextChapterTimer = setTimeout(() => {
+
+                    if (
+                        !transitioning &&
+                        !showLetter
+                    ) {
+                        if (isLastChapter) {
+                            /*
+                             * Final chapter:
+                             * show the envelope.
+                             */
+                            setShowLetter(true);
+                        } else {
+                            /*
+                             * Normal chapter:
+                             * go to next chapter.
+                             */
+                            nextChapter();
+                        }
+                    }
+
+                }, 1800);
+
+                return;
+            }
+
+            animationFrame =
+                requestAnimationFrame(
+                    autoScroll
+                );
+        };
+
+        /*
+         * Small pause before scrolling starts.
+         */
+        const startTimer = setTimeout(() => {
+
+            lastTime = performance.now();
+
+            animationFrame =
+                requestAnimationFrame(
+                    autoScroll
+                );
+
+        }, 800);
+
+        return () => {
+            clearTimeout(startTimer);
+            clearTimeout(nextChapterTimer);
+
+            if (animationFrame) {
+                cancelAnimationFrame(
+                    animationFrame
+                );
+            }
+        };
+
     }, [
         started,
         chapter,
@@ -193,45 +317,7 @@ function BirthdayExperience({ autoStart }) {
 
     /*
     |--------------------------------------------------------------------------
-    | FINAL CHAPTER → SHOW ENVELOPE
-    |--------------------------------------------------------------------------
-    |
-    | The envelope appears after the final chapter.
-    | It does NOT automatically close.
-    |
-    */
-
-    useEffect(() => {
-        if (
-            !started ||
-            !isLastChapter ||
-            showLetter ||
-            transitioning
-        ) {
-            return;
-        }
-
-        const timer = setTimeout(() => {
-            setShowLetter(true);
-
-            const closeTimer = setTimeout(() => {
-                closeLetterAndReturnHome();
-            }, 8000);
-
-            return () => clearTimeout(closeTimer);
-        }, 3000);
-
-        return () => clearTimeout(timer);
-    }, [
-        started,
-        isLastChapter,
-        showLetter,
-        transitioning,
-    ]);
-
-    /*
-    |--------------------------------------------------------------------------
-    | KEYBOARD
+    | KEYBOARD NAVIGATION
     |--------------------------------------------------------------------------
     */
 
@@ -239,10 +325,7 @@ function BirthdayExperience({ autoStart }) {
         if (!started) return;
 
         const handleKeyboard = (event) => {
-            /*
-             * Don't navigate while the birthday letter
-             * is being shown.
-             */
+
             if (showLetter) return;
 
             if (event.key === "ArrowRight") {
@@ -254,7 +337,10 @@ function BirthdayExperience({ autoStart }) {
             }
         };
 
-        window.addEventListener("keydown", handleKeyboard);
+        window.addEventListener(
+            "keydown",
+            handleKeyboard
+        );
 
         return () => {
             window.removeEventListener(
@@ -280,36 +366,49 @@ function BirthdayExperience({ autoStart }) {
 
         const touch = event.touches[0];
 
-        touchStartX.current = touch.clientX;
-        touchStartY.current = touch.clientY;
+        touchStartX.current =
+            touch.clientX;
+
+        touchStartY.current =
+            touch.clientY;
     };
 
     const handleTouchEnd = (event) => {
         if (showLetter) return;
-        if (touchStartX.current === null) return;
+        if (touchStartX.current === null) {
+            return;
+        }
 
-        const touch = event.changedTouches[0];
+        const touch =
+            event.changedTouches[0];
 
         const deltaX =
-            touch.clientX - touchStartX.current;
+            touch.clientX -
+            touchStartX.current;
 
         const deltaY =
-            touch.clientY - touchStartY.current;
+            touch.clientY -
+            touchStartY.current;
 
         touchStartX.current = null;
         touchStartY.current = null;
 
         /*
-         * Ignore vertical scrolling.
+         * Ignore vertical gestures.
          */
-        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        if (
+            Math.abs(deltaY) >
+            Math.abs(deltaX)
+        ) {
             return;
         }
 
         /*
-         * Minimum swipe.
+         * Minimum swipe distance.
          */
-        if (Math.abs(deltaX) < 60) return;
+        if (Math.abs(deltaX) < 60) {
+            return;
+        }
 
         if (deltaX < 0) {
             nextChapter();
@@ -338,7 +437,9 @@ function BirthdayExperience({ autoStart }) {
                 <FloatingDecor />
 
                 <div className="relative z-10 min-h-[100svh]">
-                    <HeroSection onStart={startStory} />
+                    <HeroSection
+                        onStart={startStory}
+                    />
                 </div>
 
             </main>
@@ -367,7 +468,7 @@ function BirthdayExperience({ autoStart }) {
             onTouchEnd={handleTouchEnd}
         >
 
-            {/* Music */}
+            {/* MUSIC */}
 
             <audio
                 ref={audioRef}
@@ -376,15 +477,19 @@ function BirthdayExperience({ autoStart }) {
                 preload="auto"
             />
 
-            {/* Background */}
+            {/* BACKGROUND */}
 
             <FloatingDecor />
 
-            {/* Music controls */}
+            {/* MUSIC PLAYER */}
 
-            <MusicPlayer audioRef={audioRef} />
+            <MusicPlayer
+                audioRef={audioRef}
+            />
 
-            {/* Chapter */}
+            {/* =====================================================
+                CURRENT CHAPTER
+            ===================================================== */}
 
             <div
                 className={`
@@ -417,7 +522,10 @@ function BirthdayExperience({ autoStart }) {
 
             </div>
 
-            {/* Chapter counter */}
+
+            {/* =====================================================
+                CHAPTER COUNTER
+            ===================================================== */}
 
             {!showLetter && (
                 <div className="pointer-events-none fixed left-5 top-5 z-50 sm:left-8 sm:top-7">
@@ -429,11 +537,19 @@ function BirthdayExperience({ autoStart }) {
                         </p>
 
                         <p className="mt-0.5 text-sm font-black text-[#FF6B81]">
-                            {String(chapter + 1).padStart(2, "0")}
+
+                            {String(
+                                chapter + 1
+                            ).padStart(2, "0")}
+
                             <span className="mx-1 text-[#C5C8CB]">
                                 /
                             </span>
-                            {String(chapters.length).padStart(2, "0")}
+
+                            {String(
+                                chapters.length
+                            ).padStart(2, "0")}
+
                         </p>
 
                     </div>
@@ -441,64 +557,87 @@ function BirthdayExperience({ autoStart }) {
                 </div>
             )}
 
-            {/* Chapter navigation */}
+
+            {/* =====================================================
+                CHAPTER NAVIGATION
+            ===================================================== */}
 
             {!showLetter && (
                 <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2">
 
                     <div className="flex items-center gap-2 rounded-full border border-white/90 bg-white/80 px-4 py-2.5 shadow-xl backdrop-blur-xl">
 
-                        {chapters.map((item, index) => {
-                            const active = index === chapter;
-                            const completed = index < chapter;
+                        {chapters.map(
+                            (item, index) => {
 
-                            return (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() =>
-                                        changeChapter(index)
-                                    }
-                                    disabled={transitioning}
-                                    aria-label={`Open ${item.title}`}
-                                    title={item.title}
-                                    className="group flex h-4 items-center justify-center"
-                                >
-                                    <span
-                                        className={`
-                                            block
-                                            rounded-full
-                                            transition-all
-                                            duration-500
+                                const active =
+                                    index === chapter;
 
-                                            ${
-                                                active
-                                                    ? "h-1.5 w-7 bg-[#FF6B81]"
-                                                    : completed
-                                                    ? "h-1.5 w-1.5 bg-[#FF6B81]/50"
-                                                    : "h-1.5 w-1.5 bg-[#D7DADD] group-hover:bg-[#FFB4C2]"
-                                            }
-                                        `}
-                                    />
-                                </button>
-                            );
-                        })}
+                                const completed =
+                                    index < chapter;
+
+                                return (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() =>
+                                            changeChapter(
+                                                index
+                                            )
+                                        }
+                                        disabled={
+                                            transitioning
+                                        }
+                                        aria-label={`Open ${item.title}`}
+                                        title={
+                                            item.title
+                                        }
+                                        className="group flex h-4 items-center justify-center"
+                                    >
+
+                                        <span
+                                            className={`
+                                                block
+                                                rounded-full
+                                                transition-all
+                                                duration-500
+
+                                                ${
+                                                    active
+                                                        ? "h-1.5 w-7 bg-[#FF6B81]"
+                                                        : completed
+                                                        ? "h-1.5 w-1.5 bg-[#FF6B81]/50"
+                                                        : "h-1.5 w-1.5 bg-[#D7DADD] group-hover:bg-[#FFB4C2]"
+                                                }
+                                            `}
+                                        />
+
+                                    </button>
+                                );
+                            }
+                        )}
 
                     </div>
 
                 </div>
             )}
 
+
             {/* =====================================================
-                BIRTHDAY ENVELOPE
-               ===================================================== */}
+                BIRTHDAY LETTER
+            ===================================================== */}
 
             {showLetter && (
                 <div className="absolute inset-0 z-[100] overflow-y-auto bg-[#fff5f6]">
 
                     <BirthdayLetter
                         open={showLetter}
-                        onClose={closeLetterAndReturnHome}
+                        onClose={() => {
+                            setShowLetter(false);
+                            setStarted(false);
+                            setChapter(0);
+                            setTransitioning(false);
+                        }}
                     />
 
                 </div>
@@ -508,21 +647,18 @@ function BirthdayExperience({ autoStart }) {
     );
 }
 
+
 /*
 |--------------------------------------------------------------------------
-| PASSWORD PROTECTION
+| PASSWORD GATE
 |--------------------------------------------------------------------------
 */
 
 export default function Home() {
-    const [isUnlocked, setIsUnlocked] = useState(false);
-
-    if (!isUnlocked) {
-        return (
-            <PasswordGate onUnlocked={() => setIsUnlocked(true)} />
-        );
-    }
-
-    return <BirthdayExperience autoStart={true} />;
+    return (
+        <PasswordGate>
+            <BirthdayExperience />
+        </PasswordGate>
+    );
 }
 

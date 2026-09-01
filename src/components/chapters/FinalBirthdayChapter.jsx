@@ -47,7 +47,7 @@ export default function FinalBirthdayChapter({
                 <h1 className="mt-5 font-serif text-5xl font-black leading-tight text-[#263238] sm:text-7xl">
                     Happy Birthday,
                     <span className="block text-[#FF6B81]">
-                        Shrawan Khot
+                        Shrawan
                     </span>
                 </h1>
 
